@@ -12,14 +12,18 @@ with open("pg29765.txt", encoding="utf8") as f:
 	last_line = ""
 	last_words = []
 	clean_words = []
-    for i in range(25):
-        last_words.append("")
-        clean_words.append("")
+	for i in range(25):
+		last_words.append("")
+		clean_words.append("")
 	for line in f:
 		line = str(line.strip().encode("utf8"))[2:-1]
 		if len(line) > 0 and len(last_line) > 0 and last_line.upper() == last_line:
 			#print(last_line)
 			#print(line)
+			
+			#Fix dictionary errors
+			line = line.replace("Ev\"er adv.", "Ev\"er, adv.")
+			
 			upper_words = last_line.split("; ")
 			words = (line + " , ").split(", ")
 			count = min(len(upper_words), len(words))

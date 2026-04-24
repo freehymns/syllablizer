@@ -668,7 +668,9 @@ def syllablize_text(text):
 with open("syllables.txt", encoding="utf8") as f:
 	for line in f:
 		line = line.strip().lower()
-		syllables = line.lower().replace("`","-").replace('"',"-").replace("*","-")
+		syllables = line.lower().replace("`","-").replace('"',"-").replace("*","-").replace("--", "-")
+		if syllables[-1:] == "-":
+			syllables = syllables[0:-1]
 		word = syllables.replace("-", "")
 		if dict.get(word) == None:
 			dict[word] = syllables
