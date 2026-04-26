@@ -2,10 +2,10 @@ import sys
 
 '''
 Extracts the dictionary syllablized words from The Project Gutenberg eBook
-of Webster's Unabridged Dictionary, which can be found
+of Webster's Unabridged Dictionary, which can be found at
 https://www.gutenberg.org/cache/epub/29765/pg29765.txt
 
-The syllables.txt file was generated using this script
+The syllables.txt file was generated using this script.
 '''
 
 with open("pg29765.txt", encoding="utf8") as f:

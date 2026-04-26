@@ -594,17 +594,27 @@ def syllablize_word(word):
 		if syllables is None and w[-4:] == "ch's":
 			syllables = algorithm(w[:-4], "ch", "ch-'s")
 		if syllables is None and w[-3:] == "ses":
-			syllables = algorithm(w[:-3], "s", "s-es")
+			syllables = algorithm(w[:-3], "se", "s-es")
+		#if syllables is None and w[-3:] == "ses":
+		#	syllables = algorithm(w[:-3], "s", "s-es")
+		#if syllables is None and w[-3:] == "ces":
+		#	syllables = algorithm(w[:-3], "ce", "c-es")
+		if syllables is None and w[-2:] == "es":
+			syllables = algorithm(w[:-2], "e", "-es")
 		if syllables is None and w[-3:] == "ies":
 			syllables = algorithm(w[:-3], "y", "ies")
 		if syllables is None and w[-1:] == "s":
 			syllables = algorithm(w[:-1], "", "s")
 		if syllables is None and w[-3:] == "ied":
 			syllables = algorithm(w[:-3], "y", "ied")
+		if syllables is None and w[-3:] == "ded":
+			syllables = algorithm(w[:-3], "d", "d-ed")
+		if syllables is None and w[-3:] == "ted":
+			syllables = algorithm(w[:-3], "t", "t-ed")
 		if syllables is None and w[-2:] == "ed":
 			syllables = algorithm(w[:-2], "", "ed")
-		if syllables is None and w[-2:] == "ed":
-			syllables = algorithm(w[:-2], "e", "ed")
+		if syllables is None and w[-3:] == "est":
+			syllables = algorithm(w[:-3], "e", "-est")
 		if syllables is None and w[-2:] == "ly":
 			syllables = algorithm(w[:-2], "", "-ly")
 		if syllables is None and w[-2:] == "ly":
@@ -664,18 +674,73 @@ def syllablize_text(text):
 		else:
 			line += token
 	print(line.strip())
-
-with open("syllables.txt", encoding="utf8") as f:
-	for line in f:
-		line = line.strip().lower()
-		syllables = line.lower().replace("`","-").replace('"',"-").replace("*","-").replace("--", "-")
-		if syllables[-1:] == "-":
-			syllables = syllables[0:-1]
-		word = syllables.replace("-", "")
-		if dict.get(word) == None:
-			dict[word] = syllables
 	
-if len(sys.argv) > 1 and sys.argv[1] == "clip":
+def test(word, syllables):
+	result = syllablize_word(word)
+	s = word + " -> " + result
+	if result == syllables:
+		print(s + "  PASS")
+		return 0
+	else:
+		print(s + "  Expected " + syllables + "  FAIL")
+		return 1
+
+def tests():
+	failures = 0
+	failures += test("hyphenation", "hy-phen-a-tion") #Dictionary word, fully broken into syllables
+	failures += test("supercalifragilisticexpialidocious", "su-per-cal-ifrag-ilis-tic-ex-pi-ali-do-cious") #Non-dictionary word.  Not fully broken into syllables, but hyphens added
+	failures += test("the", "the")
+	failures += test("beautiful", "beau-ti-ful")
+	failures += test("serious", "se-ri-ous")
+	failures += test("seriously", "se-ri-ous-ly")
+	failures += test("Jesus's", "Je-sus-'s")
+	failures += test("princesses", "prin-cess-es")
+	failures += test("praises", "prais-es")
+	failures += test("offices", "of-fic-es")
+	failures += test("ages", "ag-es")
+	failures += test("candy", "can-dy")
+	failures += test("candies", "can-dies")
+	failures += test("capable", "ca-pa-ble")
+	failures += test("capably", "ca-pa-bly")
+	failures += test("pawn", "pawn")
+	failures += test("pawns", "pawns")
+	failures += test("garden", "gar-den")
+	failures += test("gardens", "gar-dens")
+	failures += test("gardened", "gar-dened")
+	failures += test("project", "proj-ect")
+	failures += test("loved", "loved")
+	failures += test("beloved", "be-loved")
+	failures += test("forfeited", "for-feit-ed")
+	failures += test("added", "add-ed")
+	failures += test("pulled", "pulled")
+	failures += test("best", "best")
+	failures += test("harvest", "har-vest")
+	failures += test("changest", "chang-est")
+	print("\n" + str(failures) + " failures")
+
+try:
+	with open("syllables.txt", encoding="utf8") as f:
+		for line in f:
+			line = line.strip().lower()
+			syllables = line.lower().replace("`","-").replace('"',"-").replace("*","-").replace("--", "-")
+			if syllables[-1:] == "-":
+				syllables = syllables[0:-1]
+			word = syllables.replace("-", "")
+			if dict.get(word) == None:
+				dict[word] = syllables
+except:
+	print("Error reading syllables.txt file:")
+	raise
+
+
+	
+option = ("" if (len(sys.argv) <= 1) else sys.argv[1].replace("-", ""))
+if option == "?" or option == "help":
+	print("Syntax: " + sys.argv[0] + " [-help | -tests | -clip]\n")
+	print("The -clip option reads text from the Windows clipboard instead of standard input.")
+elif option == "tests":
+	tests()
+elif option == "clip":
 	encoding = "cp1252"
 	if len(sys.argv) > 2:
 		encoding = sys.argv[2]
